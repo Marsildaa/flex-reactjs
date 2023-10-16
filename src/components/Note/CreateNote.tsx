@@ -5,15 +5,17 @@ import {
   TextField,
   Typography,
   Grid,
+  CardActions,
+  TextareaAutosize,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { SelectedItemContext } from "../common/SelectedItemContext";
-import { set, ref, push } from "firebase/database";
-import { db } from "../../firebaseConfig";
 import DoneIcon from "@mui/icons-material/Done";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { Note } from "../common/Interfaces";
+import "../style/General.css";
+import SnackbarShowFunction from "../common/SnackbarShowFunction";
 
 interface Props {
   setShowCreateNote: () => void;
@@ -26,12 +28,14 @@ const CreateNote = (props: Props) => {
     message: "",
   });
   const context = useContext(SelectedItemContext);
+  const snackbar = SnackbarShowFunction();
 
   const handleChange = (e: any) => {
     setNote({ ...note, [e.target.name]: e.target.value });
   };
 
   const newNote = () => {
+    context.setLoading(true);
     const id = context.selectedCategoryId;
     let noteList: Array<Note> = JSON.parse(JSON.stringify(props.notes));
     noteList.push({ ...note, id: generateId() });
@@ -43,9 +47,12 @@ const CreateNote = (props: Props) => {
         setNote({ title: "", message: "" });
         props.setShowCreateNote();
         context.setRefreshAllCategories();
+        context.setLoading(false);
+        snackbar.show("success", "Note created successfully!");
       })
       .catch((error) => {
-        console.error("Error updating data:", error);
+        context.setLoading(false);
+        snackbar.show("error", "Error creating note!");
       });
   };
 
@@ -63,9 +70,10 @@ const CreateNote = (props: Props) => {
   }, [context.selectedCategoryId]);
 
   return (
-    <Card>
+    <Card className="card">
       <CardContent>
         <TextField
+          sx={{ mb: 2 }}
           variant="standard"
           placeholder="Add a title"
           name="title"
@@ -73,20 +81,25 @@ const CreateNote = (props: Props) => {
           onChange={(event) => handleChange(event)}
           fullWidth
         />
-        <TextField
+        <TextareaAutosize
+          minRows={40}
+          maxRows={100}
+          className="custom-textarea"
+          style={{ width: "100%", border: "none" }}
           name="message"
-          variant="standard"
           value={note.message}
           placeholder="Write your note here..."
           onChange={(event) => handleChange(event)}
-          fullWidth
         />
+      </CardContent>
+      <CardActions>
         <Grid
-          sx={{ marginTop: "20px" }}
           container
+          mt={4}
           direction="row"
+          className="cardButtons"
           justifyContent="space-between"
-          alignItems="center"
+          alignItems="flex-end"
         >
           <Grid item>
             <Button
@@ -112,7 +125,7 @@ const CreateNote = (props: Props) => {
             </Button>
           </Grid>
         </Grid>
-      </CardContent>
+      </CardActions>
     </Card>
   );
 };

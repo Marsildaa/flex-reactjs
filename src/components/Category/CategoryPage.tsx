@@ -1,9 +1,8 @@
-import { Box, CardContent, Grid, Card } from "@mui/material";
+import { Box, CardContent, Grid, Card, Typography } from "@mui/material";
 import CategoryList from "./CategoryList";
-import CreateNote from "../Note/CreateNote";
 import { useState } from "react";
-import useToggle from "../common/useToggle";
 import NotePage from "../Note/NotePage";
+import "../style/General.css";
 
 const CategoryPage = () => {
   const [showNotes, setShowNotes] = useState<string>("");
@@ -18,9 +17,11 @@ const CategoryPage = () => {
           {showNotes ? (
             <NotePage />
           ) : (
-            <Card>
+            <Card className="card">
               <CardContent>
-                <div>Select a category to add notes</div>
+                <Typography variant="h6" component="div" align="center" p={20}>
+                  Select a category to add notes
+                </Typography>
               </CardContent>
             </Card>
           )}

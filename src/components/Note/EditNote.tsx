@@ -5,14 +5,16 @@ import {
   TextField,
   Typography,
   Grid,
+  TextareaAutosize,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { SelectedItemContext } from "../common/SelectedItemContext";
-import { db } from "../../firebaseConfig";
 import DoneIcon from "@mui/icons-material/Done";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { Note } from "../common/Interfaces";
+import "../style/General.css";
+import SnackbarShowFunction from "../common/SnackbarShowFunction";
 
 interface Props {
   notes: Array<Note>;
@@ -25,12 +27,16 @@ const EditNote = (props: Props) => {
     title: "",
     message: "",
   });
+
+  const context = useContext(SelectedItemContext);
+  const snackbar = SnackbarShowFunction();
+
   const handleChange = (e: any) => {
     setEditedNote({ ...editedNote, [e.target.name]: e.target.value });
   };
-  const context = useContext(SelectedItemContext);
 
   const editNote = () => {
+    context.setLoading(true);
     const id = context.selectedCategoryId;
     let noteList: Array<Note> = JSON.parse(JSON.stringify(props.notes));
     let updatedNoteList = noteList.map((note) => {
@@ -48,19 +54,23 @@ const EditNote = (props: Props) => {
         props.onEditOrDelete();
         context.setRefreshAllCategories();
         setEditedNote({ title: "", message: "" });
+        context.setLoading(false);
+        snackbar.show("success", "Note updated successfully!");
       })
       .catch((error) => {
-        console.error("Error updating data:", error);
+        context.setLoading(false);
+        snackbar.show("error", "Error updating note!");
       });
   };
 
   const deleteNote = () => {
+    context.setLoading(true);
     const id = context.selectedCategoryId;
     let noteList: Array<Note> = JSON.parse(JSON.stringify(props.notes));
     const deletedElementIndex = noteList.findIndex(
       (el) => el.id == props.editNoteId
     );
-    noteList = noteList.splice(deletedElementIndex, 1);
+    noteList.splice(deletedElementIndex, 1);
     axios
       .patch(`${process.env.REACT_APP_API_URL}/category/${id}.json`, {
         notes: noteList,
@@ -69,9 +79,13 @@ const EditNote = (props: Props) => {
         props.onEditOrDelete();
         context.setRefreshAllCategories();
         setEditedNote({ title: "", message: "" });
+        context.setLoading(false);
+        snackbar.show("success", "Note deleted successfully!");
       })
       .catch((error) => {
         console.error("Error updating data:", error);
+        context.setLoading(false);
+        snackbar.show("error", "Error deleting note!");
       });
   };
 
@@ -84,7 +98,7 @@ const EditNote = (props: Props) => {
   }, [props.editNoteId]);
 
   return (
-    <Card>
+    <Card className="card">
       <CardContent>
         <TextField
           variant="standard"
@@ -94,20 +108,23 @@ const EditNote = (props: Props) => {
           onChange={(event) => handleChange(event)}
           fullWidth
         />
-        <TextField
+
+        <TextareaAutosize
+          minRows={40}
+          maxRows={100}
+          className="custom-textarea"
+          style={{ width: "100%", border: "none" }}
           name="message"
-          variant="standard"
           value={editedNote.message}
           placeholder="Write your note here..."
           onChange={(event) => handleChange(event)}
-          fullWidth
         />
         <Grid
-          sx={{ marginTop: "20px" }}
           container
+          mt={4}
           direction="row"
           justifyContent="space-between"
-          alignItems="center"
+          alignItems="flex-end"
         >
           <Grid item>
             <Button

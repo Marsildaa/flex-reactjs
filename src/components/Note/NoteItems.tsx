@@ -1,5 +1,6 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Note } from "../common/Interfaces";
+import "../style/General.css";
 
 interface Props {
   notes: Array<Note>;
@@ -11,7 +12,7 @@ interface Props {
 
 const NoteItems = (props: Props) => {
   return (
-    <>
+    <Box mt={1}>
       {props.notes.filter((el) =>
         el.title.toUpperCase().includes(props.searchValue.toUpperCase())
       ).length > 0 ? (
@@ -35,13 +36,15 @@ const NoteItems = (props: Props) => {
             >
               <div style={{ fontWeight: "700" }}>{note?.title}</div>
               <div>{note?.message}</div>
-              <hr />
+              <hr className="hr" />
             </Box>
           ))
       ) : (
-        <div>No notes available</div>
+        <Typography variant="h6" component="div" align="center" p={20}>
+          No notes available
+        </Typography>
       )}
-    </>
+    </Box>
   );
 };
 

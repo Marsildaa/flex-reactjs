@@ -1,14 +1,11 @@
 import {
-  Box,
   Button,
   Card,
   CardContent,
   Grid,
-  IconButton,
   TextField,
   Typography,
 } from "@mui/material";
-import "../style/Category.css";
 import AddIcon from "@mui/icons-material/Add";
 import DoneIcon from "@mui/icons-material/Done";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -17,6 +14,8 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { SelectedItemContext } from "../common/SelectedItemContext";
 import useToggle from "../common/useToggle";
+import "../style/General.css";
+import SnackbarShowFunction from "../common/SnackbarShowFunction";
 
 interface Props {
   setShowNotes: (val: string) => void;
@@ -26,9 +25,11 @@ const CategoryList = (props: Props) => {
   const [showCreateCategory, setShowCreateCategory] = useToggle();
   const [categoryName, setCategoryName] = useState<string>("");
   const [refreshCategoryList, setRefreshCategoryList] = useToggle();
+  const snackbar = SnackbarShowFunction();
 
   const newCategory = async () => {
     if (categoryName !== "") {
+      context.setLoading(true);
       await axios
         .post(`${process.env.REACT_APP_API_URL}/category.json`, {
           name: categoryName,
@@ -37,9 +38,12 @@ const CategoryList = (props: Props) => {
           setShowCreateCategory();
           setCategoryName("");
           setRefreshCategoryList();
+          context.setLoading(false);
+          snackbar.show("success", "Category created successfully!");
         })
         .catch((error) => {
-          console.log(error, "errorr");
+          context.setLoading(false);
+          snackbar.show("error", "Error creating category!");
         });
     }
   };
@@ -49,32 +53,58 @@ const CategoryList = (props: Props) => {
   }, [context.selectedCategoryId]);
 
   return (
-    <Card>
+    <Card className="card">
       <CardContent>
         {showCreateCategory ? (
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", gap: 3 }}>
             <TextField
               placeholder="Add a title..."
               variant="outlined"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target?.value)}
               fullWidth
+              InputProps={{
+                style: { height: "32px" },
+              }}
             />
-            <IconButton children={<DoneIcon />} onClick={newCategory} />
-            <IconButton
-              children={<ClearIcon />}
-              onClick={setShowCreateCategory}
-            />
+            <Button
+              variant="contained"
+              onClick={newCategory}
+              className="createButton"
+            >
+              <DoneIcon />
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setShowCreateCategory();
+                setCategoryName("");
+              }}
+              className="deleteButton"
+            >
+              <ClearIcon />
+            </Button>
           </div>
         ) : (
           <Button
             variant="contained"
-            color="success"
+            className="createButton"
             fullWidth
-            endIcon={<AddIcon />}
             onClick={setShowCreateCategory}
           >
-            <Typography>Create Category</Typography>
+            <Grid
+              container
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Grid item xs={11}>
+                <Typography className="textButton">Create Category</Typography>
+              </Grid>
+              <Grid item xs={1} mt={1}>
+                <AddIcon />
+              </Grid>
+            </Grid>
           </Button>
         )}
 

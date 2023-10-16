@@ -1,0 +1,52 @@
+.createButton {
+  border-radius: 5px !important;
+  background: #71cf48 !important;
+  height: 32px !important;
+}
+.deleteButton {
+  border-radius: 5px !important;
+  background: #fe4c4a !important;
+  height: 32px !important;
+}
+.disabledButton {
+  background: #efefef !important;
+  height: 32px !important;
+}
+.card {
+  min-height: 87vh !important;
+  max-height: 500px !important;
+  overflow: auto !important;
+}
+.cardContent {
+  display: "flex" !important;
+  flex-direction: "column" !important;
+  word-wrap: "break-word" !important;
+}
+.hr {
+  color: #efefef !important;
+}
+.textButton {
+  color: #fff !important;
+  font-family: Open Sans !important;
+  font-size: 14px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  text-transform: none !important;
+}
+.createNote {
+  font-family: Open Sans !important;
+  font-size: 14px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  text-transform: none !important;
+}
+.custom-textarea::placeholder {
+  color: #676565 !important;
+  font-family: Open Sans !important;
+  font-size: 14px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+}
